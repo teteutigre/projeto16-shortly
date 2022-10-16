@@ -4,10 +4,6 @@ import path from "path";
 
 dotenv.config({ path: path.resolve("./.env") });
 
-console.log(process.env.PASSWORD);
-
-console.log(path.resolve("./"));
-
 const { Pool } = pg;
 
 export const connection = new Pool({

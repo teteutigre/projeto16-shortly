@@ -1,7 +1,6 @@
 import { connection } from "../database/db.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { v4 as uuid } from "uuid";
 
 export async function signUp(req, res) {
   const { email, password, name } = req.body;
@@ -29,23 +28,27 @@ export async function signUp(req, res) {
 }
 
 export async function signIn(req, res) {
-  const { email, password } = req.body;
+  const { email } = req.body;
 
   try {
-    const verify = await connection.query(
+    const { rows: verify } = await connection.query(
       `SELECT * FROM users WHERE email=$1;`,
       [email]
     );
 
-    if (!verify) {
+    if (verify.length === 0) {
       return res.sendStatus(401);
     }
 
-    const token = jwt.sign(email, process.env.TOKEN_SECRET, {
-      expiresIn: "7d",
-    });
+    const token = jwt.sign(
+      { id: verify[0].id, email },
+      process.env.TOKEN_SECRET,
+      {
+        expiresIn: "7d",
+      }
+    );
 
-    return res.status(200).send(token);
+    return res.status(200).send({ email, token });
   } catch (err) {
     console.error(err);
     res.sendStatus(500);
