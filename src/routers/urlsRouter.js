@@ -5,6 +5,7 @@ import { validateSchema } from "../middlewares/validateSchema.js";
 import {
   deleteUrl,
   getUrl,
+  raking,
   redirectUrl,
   shortUrl,
 } from "../Controllers/urlsController.js";
@@ -24,4 +25,5 @@ urlsRouter.get("/urls/open/:shortUrl", redirectUrl);
 
 urlsRouter.delete("/urls/:id", validateToken, deleteUrl);
 
+urlsRouter.get("/ranking", raking);
 export default urlsRouter;
