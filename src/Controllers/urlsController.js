@@ -1,4 +1,3 @@
-import { func } from "joi";
 import { nanoid } from "nanoid";
 import { connection } from "../database/db.js";
 
@@ -66,4 +65,29 @@ export async function redirectUrl(req, res) {
   }
 }
 
-export async function deleteUrl(req, res) {}
+export async function deleteUrl(req, res) {
+  const { user } = res.locals;
+  const { id } = req.params;
+
+  try {
+    const { rows: urlExists } = await connection.query(
+      `SELECT * FROM links WHERE id = $1;`,
+      [id]
+    );
+
+    if (urlExists.length === 0) {
+      return res.sendStatus(404);
+    }
+
+    if (urlExists[0].userId !== user.id) {
+      return res.sendStatus(401);
+    }
+
+    await connection.query(`DELETE FROM links WHERE id = $1;`, [id]);
+
+    res.sendStatus(204);
+  } catch (err) {
+    onsole.error(err);
+    res.sendStatus(500);
+  }
+}
