@@ -1,3 +1,4 @@
+import { func } from "joi";
 import { nanoid } from "nanoid";
 import { connection } from "../database/db.js";
 
@@ -40,3 +41,29 @@ export async function getUrl(req, res) {
     res.sendStatus(500);
   }
 }
+
+export async function redirectUrl(req, res) {
+  const { shortUrl } = req.params;
+
+  try {
+    const { rows: searchShortUrl } = await connection.query(
+      `SELECT url FROM links WHERE "shortUrl" = $1;`,
+      [shortUrl]
+    );
+
+    if (searchShortUrl.length === 0) {
+      return res.sendStatus(404);
+    }
+
+    connection.query(
+      `UPDATE links SET "visitCount" = "visitCount" + 1 WHERE "shortUrl" = $1;`,
+      [shortUrl]
+    );
+    res.redirect(searchShortUrl[0].url);
+  } catch (err) {
+    onsole.error(err);
+    res.sendStatus(500);
+  }
+}
+
+export async function deleteUrl(req, res) {}
