@@ -12,5 +12,6 @@ const databaseConfig = {
     rejectUnauthorized: false,
   },
 };
+const connection = new Pool(databaseConfig);
 
-export const connection = new Pool(databaseConfig);
+export default connection;
